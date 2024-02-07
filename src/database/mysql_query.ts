@@ -1,18 +1,10 @@
 import * as mysqldb from "mysql2";
 import { v4 as uuidv4 } from "uuid";
 import config from "../config";
+import { ImageList, Imageurl } from "../interface/interface";
 
 const mysql = require("mysql2/promise");
 
-interface ImageList {
-  id: string;
-  fileName: string;
-  used: boolean;
-}
-interface Imageurl {
-  url: string;
-  used: boolean;
-}
 export class MysqlQuery {
   public static readonly MAX_QUERY_ITEMS = 500;
   private pool: mysqldb.Pool;
@@ -54,6 +46,28 @@ export class MysqlQuery {
             `INSERT INTO Image (id, fileName, used)
              VALUES (?,?,?)`,
             [uuidv4(), FileName, false],
+            (err, res) => {
+              connection.release();
+              if (err) resolve(false);
+              else {
+                resolve(true);
+              }
+            }
+          );
+        }
+      });
+    });
+  }
+
+  public async DeleteImg(FileName: string): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      this.pool.getConnection((err, connection) => {
+        if (err) {
+          resolve(false);
+        } else {
+          this.pool.query(
+            `DELETE FROM Image WHERE fileName = ?`,
+            [FileName],
             (err, res) => {
               connection.release();
               if (err) resolve(false);
