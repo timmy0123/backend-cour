@@ -8,4 +8,7 @@ export default {
     password: process.env.DB_PASS as string,
     port: process.env.DB_PORT as string,
   },
+  url_config: {
+    url: process.env.URL as string,
+  },
 };

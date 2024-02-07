@@ -1,6 +1,5 @@
 import express from "express";
 import { MysqlQuery } from "../database/mysql_query";
-import { mock } from "node:test";
 
 const router = express.Router();
 
