@@ -109,4 +109,42 @@ export class MysqlQuery {
       });
     });
   }
+
+  public async SelectImg(Imgs: string[]): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      this.pool.getConnection((err, connection) => {
+        if (err) {
+          console.log(err);
+          resolve(false);
+        } else {
+          this.pool.query(
+            `UPDATE Image SET used = false;            `,
+            (err: any, res: ImageList[]) => {
+              if (err) resolve(false);
+              else {
+                var ids = Imgs.map(function (a) {
+                  return "'" + a.replace("'", "''") + "'";
+                }).join();
+
+                var sql = `UPDATE Image 
+                SET used = true
+                WHERE fileName IN (${ids});`;
+
+                this.pool.query(sql, (err: any, res: any) => {
+                  connection.release();
+                  if (err) {
+                    console.log(err);
+                    resolve(false);
+                  } else {
+                    console.log(res);
+                    resolve(true);
+                  }
+                });
+              }
+            }
+          );
+        }
+      });
+    });
+  }
 }
