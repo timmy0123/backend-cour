@@ -13,12 +13,16 @@ const UploadImg = require("./routes/UploadImg");
 const ListImg = require("./routes/ListImg");
 const DeleteImg = require("./routes/deleteImg");
 const SelectImg = require("./routes/UseImg");
+const ListItem = require("./routes/ListItem");
+const UploadItem = require("./routes/UploadItem");
 
 app.use("/GetUser", GetUser);
 app.use("/UploadImg", UploadImg);
 app.use("/ListImg", ListImg);
 app.use("/DeleteImg", DeleteImg);
 app.use("/SelectImg", SelectImg);
+app.use("/ListItem", ListItem);
+app.use("/UploadItem", UploadItem);
 app.use(
   "/image",
   express.static(path.join(__dirname, "../public/images/uploads"))

@@ -1,7 +1,7 @@
 import * as mysqldb from "mysql2";
 import { v4 as uuidv4 } from "uuid";
 import config from "../config";
-import { ImageList, Imageurl } from "../interface/interface";
+import { ImageList, Imageurl, ItemList } from "../interface/interface";
 
 const mysql = require("mysql2/promise");
 
@@ -140,6 +140,68 @@ export class MysqlQuery {
                     resolve(true);
                   }
                 });
+              }
+            }
+          );
+        }
+      });
+    });
+  }
+
+  public async ListItem(): Promise<ItemList[] | null> {
+    return new Promise<ItemList[] | null>((resolve) => {
+      this.pool.getConnection((err, connection) => {
+        if (err) {
+          resolve(null);
+        } else {
+          this.pool.query(
+            `SELECT pictureUrl,itemName,title,subtitle,itemDescription FROM item`,
+            (err: any, res: ItemList[]) => {
+              connection.release();
+              if (err) resolve(null);
+              else {
+                let Items: ItemList[] = [];
+                for (let i = 0; i < res.length; i++) {
+                  let cur = res[i];
+                  Items.push({
+                    id: cur.id,
+                    pictureUrl: `${config.url_config.itemurl}/${cur.pictureUrl}`,
+                    itemName: cur.itemName,
+                    title: cur.title,
+                    subtitle: cur.subtitle,
+                    itemDescription: cur.itemDescription,
+                  });
+                }
+                resolve(Items);
+              }
+            }
+          );
+        }
+      });
+    });
+  }
+
+  public async UploadItem(
+    pictureUrl: string,
+    itemName: string,
+    title: string,
+    subtitle: string,
+    itemDescription: string
+  ): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      this.pool.getConnection((err, connection) => {
+        if (err) {
+          resolve(false);
+        } else {
+          this.pool.query(
+            `INSERT INTO item (id, pictureUrl, itemName, title, subtitle, itemDescription)
+             VALUES (?,?,?,?,?,?)`,
+            [uuidv4(), pictureUrl, itemName, title, subtitle, itemDescription],
+            (err, res) => {
+              connection.release();
+              if (err) resolve(false);
+              else {
+                resolve(true);
               }
             }
           );

@@ -10,5 +10,6 @@ export default {
   },
   url_config: {
     url: process.env.URL as string,
+    itemurl: process.env.ITEM_URL as string,
   },
 };
