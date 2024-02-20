@@ -1,7 +1,8 @@
 import * as mysqldb from "mysql2";
 import { v4 as uuidv4 } from "uuid";
 import config from "../config";
-import { ImageList, Imageurl, ItemList } from "../interface/interface";
+import { ImageList, Imageurl, ItemList, Itemdb } from "../interface/interface";
+import { add } from "lodash";
 
 const mysql = require("mysql2/promise");
 
@@ -114,7 +115,6 @@ export class MysqlQuery {
     return new Promise<boolean>((resolve) => {
       this.pool.getConnection((err, connection) => {
         if (err) {
-          console.log(err);
           resolve(false);
         } else {
           this.pool.query(
@@ -133,10 +133,8 @@ export class MysqlQuery {
                 this.pool.query(sql, (err: any, res: any) => {
                   connection.release();
                   if (err) {
-                    console.log(err);
                     resolve(false);
                   } else {
-                    console.log(res);
                     resolve(true);
                   }
                 });
@@ -151,18 +149,24 @@ export class MysqlQuery {
   public async ListItem(): Promise<ItemList[] | null> {
     return new Promise<ItemList[] | null>((resolve) => {
       this.pool.getConnection((err, connection) => {
-        if (err) {
-          resolve(null);
-        } else {
+        if (err) resolve(null);
+        else {
           this.pool.query(
-            `SELECT pictureUrl,itemName,title,subtitle,itemDescription FROM item`,
-            (err: any, res: ItemList[]) => {
+            `SELECT item.id,pictureUrl,item.itemName,title,subtitle,itemDescription, 
+             GROUP_CONCAT(store_location.country  SEPARATOR ', ') AS city,
+             GROUP_CONCAT(store_location.district  SEPARATOR ', ') AS district, 
+             GROUP_CONCAT(store_location.address  SEPARATOR ', ') AS address FROM item 
+             JOIN store_location 
+             ON item.itemName = store_location.itemName
+             GROUP BY item.itemName`,
+            (err: any, res: Itemdb[]) => {
               connection.release();
               if (err) resolve(null);
               else {
                 let Items: ItemList[] = [];
                 for (let i = 0; i < res.length; i++) {
                   let cur = res[i];
+
                   Items.push({
                     id: cur.id,
                     pictureUrl: `${config.url_config.itemurl}/${cur.pictureUrl}`,
@@ -170,6 +174,9 @@ export class MysqlQuery {
                     title: cur.title,
                     subtitle: cur.subtitle,
                     itemDescription: cur.itemDescription,
+                    city: cur.city.split(", "),
+                    district: cur.district.split(", "),
+                    address: cur.address.split(", "),
                   });
                 }
                 resolve(Items);
@@ -197,6 +204,78 @@ export class MysqlQuery {
             `INSERT INTO item (id, pictureUrl, itemName, title, subtitle, itemDescription)
              VALUES (?,?,?,?,?,?)`,
             [uuidv4(), pictureUrl, itemName, title, subtitle, itemDescription],
+            (err, res) => {
+              connection.release();
+              if (err) resolve(false);
+              else {
+                resolve(true);
+              }
+            }
+          );
+        }
+      });
+    });
+  }
+
+  public async DeleteItem(ItemName: string): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      this.pool.getConnection((err, connection) => {
+        if (err) {
+          resolve(false);
+        } else {
+          this.pool.query(
+            `DELETE FROM item WHERE itemName = ?`,
+            [ItemName],
+            (err, res) => {
+              connection.release();
+              if (err) resolve(false);
+              else {
+                resolve(true);
+              }
+            }
+          );
+        }
+      });
+    });
+  }
+
+  public async UploadLoc(
+    itemName: string,
+    city: string,
+    district: string,
+    address: string
+  ): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      this.pool.getConnection((err, connection) => {
+        if (err) {
+          resolve(false);
+        } else {
+          this.pool.query(
+            `INSERT INTO store_location (id,itemName,country,district,address)
+             VALUES (?,?,?,?,?,?)`,
+            [uuidv4(), itemName, city, district, address],
+            (err, res) => {
+              connection.release();
+              if (err) resolve(false);
+              else {
+                resolve(true);
+              }
+            }
+          );
+        }
+      });
+    });
+  }
+
+  public async Deleteloc(ItemName: string): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      this.pool.getConnection((err, connection) => {
+        if (err) {
+          resolve(false);
+        } else {
+          this.pool.query(
+            `DELETE FROM store_location WHERE itemName = ?`,
+            [ItemName],
             (err, res) => {
               connection.release();
               if (err) resolve(false);

@@ -26,6 +26,19 @@ router.post("/", upload.single("image"), (req, res) => {
     const title = req.query.title as string;
     const subtitle = req.query.subtitle as string;
     const description = req.query.description as string;
+    let city = req.query.city as string[];
+    let district = req.query.district as string[];
+    let address = req.query.address as string[];
+
+    if (typeof city === "string") {
+      city = [city];
+    }
+    if (typeof district === "string") {
+      district = [district];
+    }
+    if (typeof address === "string") {
+      address = [address];
+    }
 
     (async () => {
       const metadata = await queryEvent.UploadItem(
@@ -35,11 +48,33 @@ router.post("/", upload.single("image"), (req, res) => {
         subtitle,
         description
       );
-      const newPath = `public/images/items/${req!.file!.originalname}`;
+
       if (!metadata) return res.status(400).json({ error: "database broken" });
+      for (let i = 0; i < city.length; i++) {
+        const locdata = await queryEvent.UploadLoc(
+          itemName,
+          city[i],
+          district[i],
+          address[i]
+        );
+        if (!locdata) {
+          // delete builded data
+          const deletedata = await queryEvent.DeleteItem(itemName);
+          const deleteloc = await queryEvent.Deleteloc(itemName);
+
+          return res.status(400).json({ error: "database broken" });
+        }
+      }
+
+      const newPath = `public/images/items/${req!.file!.originalname}`;
       // Rename the uploaded file
       fs.rename(req!.file!.path, newPath, (err: any) => {
         if (err) {
+          // delete builded data
+          (async () => {
+            const deletedata = await queryEvent.DeleteItem(itemName);
+            const deleteloc = await queryEvent.Deleteloc(itemName);
+          })();
           console.error("Error renaming file:", err);
           return res.status(500).json({ error: "Internal server error" });
         }
