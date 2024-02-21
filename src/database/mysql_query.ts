@@ -153,6 +153,7 @@ export class MysqlQuery {
         else {
           this.pool.query(
             `SELECT item.id,pictureUrl,item.itemName,title,subtitle,itemDescription, 
+             GROUP_CONCAT(store_location.id  SEPARATOR ', ') AS locid,
              GROUP_CONCAT(store_location.country  SEPARATOR ', ') AS city,
              GROUP_CONCAT(store_location.district  SEPARATOR ', ') AS district, 
              GROUP_CONCAT(store_location.address  SEPARATOR ', ') AS address FROM item 
@@ -169,6 +170,7 @@ export class MysqlQuery {
 
                   Items.push({
                     id: cur.id,
+                    locid: cur.locid.split(", "),
                     pictureUrl: `${config.url_config.itemurl}/${cur.pictureUrl}`,
                     itemName: cur.itemName,
                     title: cur.title,
@@ -206,6 +208,8 @@ export class MysqlQuery {
             [uuidv4(), pictureUrl, itemName, title, subtitle, itemDescription],
             (err, res) => {
               connection.release();
+              console.log(err);
+              console.log(res);
               if (err) resolve(false);
               else {
                 resolve(true);
@@ -239,6 +243,38 @@ export class MysqlQuery {
     });
   }
 
+  public async UpdateItem(
+    id: string,
+    itemName: string,
+    title: string,
+    subtitle: string,
+    itemDescription: string
+  ): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      this.pool.getConnection((err, connection) => {
+        if (err) {
+          resolve(false);
+        } else {
+          this.pool.query(
+            `Update item 
+             SET itemName = ?, title = ?, subtitle = ?, itemDescription = ?
+             WHERE id = ?`,
+            [itemName, title, subtitle, itemDescription, uuidv4()],
+            (err, res) => {
+              connection.release();
+              console.log(err);
+              console.log(res);
+              if (err) resolve(false);
+              else {
+                resolve(true);
+              }
+            }
+          );
+        }
+      });
+    });
+  }
+
   public async UploadLoc(
     itemName: string,
     city: string,
@@ -252,10 +288,11 @@ export class MysqlQuery {
         } else {
           this.pool.query(
             `INSERT INTO store_location (id,itemName,country,district,address)
-             VALUES (?,?,?,?,?,?)`,
+             VALUES (?,?,?,?,?)`,
             [uuidv4(), itemName, city, district, address],
             (err, res) => {
               connection.release();
+              console.log(err);
               if (err) resolve(false);
               else {
                 resolve(true);

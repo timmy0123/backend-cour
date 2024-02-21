@@ -21,7 +21,6 @@ router.post("/", upload.single("image"), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
   } else {
-    const pictureName = req.file.originalname as string;
     const itemName = req.query.itemname as string;
     const title = req.query.title as string;
     const subtitle = req.query.subtitle as string;
@@ -30,7 +29,7 @@ router.post("/", upload.single("image"), (req, res) => {
     let city = req.query.city as string[];
     let district = req.query.district as string[];
     let address = req.query.address as string[];
-
+    console.log(req.query.district);
     if (typeof city === "string") {
       city = [city];
     }

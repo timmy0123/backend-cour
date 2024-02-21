@@ -24,7 +24,7 @@ app.use("/DeleteImg", DeleteImg);
 app.use("/SelectImg", SelectImg);
 app.use("/ListItem", ListItem);
 app.use("/UploadItem", UploadItem);
-app.use("DeleteItem", DeleteItem);
+app.use("/DeleteItem", DeleteItem);
 app.use(
   "/image",
   express.static(path.join(__dirname, "../public/images/uploads"))

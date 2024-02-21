@@ -9,6 +9,7 @@ export interface Imageurl {
 }
 export interface ItemList {
   id: string;
+  locid: string[];
   pictureUrl: string;
   itemName: string;
   title: string;
@@ -20,6 +21,7 @@ export interface ItemList {
 }
 export interface Itemdb {
   id: string;
+  locid: string;
   pictureUrl: string;
   itemName: string;
   title: string;
