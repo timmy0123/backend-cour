@@ -31,3 +31,10 @@ export interface Itemdb {
   district: string;
   address: string;
 }
+export interface absList {
+  id: string;
+  pictureUrl: string;
+  title: string;
+  subtitle: string;
+  Description: string;
+}

@@ -1,7 +1,13 @@
 import * as mysqldb from "mysql2";
 import { v4 as uuidv4 } from "uuid";
 import config from "../config";
-import { ImageList, Imageurl, ItemList, Itemdb } from "../interface/interface";
+import {
+  ImageList,
+  Imageurl,
+  ItemList,
+  Itemdb,
+  absList,
+} from "../interface/interface";
 import { add } from "lodash";
 
 const mysql = require("mysql2/promise");
@@ -259,11 +265,9 @@ export class MysqlQuery {
             `Update item 
              SET itemName = ?, title = ?, subtitle = ?, itemDescription = ?
              WHERE id = ?`,
-            [itemName, title, subtitle, itemDescription, uuidv4()],
+            [itemName, title, subtitle, itemDescription, id],
             (err, res) => {
               connection.release();
-              console.log(err);
-              console.log(res);
               if (err) resolve(false);
               else {
                 resolve(true);
@@ -313,6 +317,136 @@ export class MysqlQuery {
           this.pool.query(
             `DELETE FROM store_location WHERE itemName = ?`,
             [ItemName],
+            (err, res) => {
+              connection.release();
+              if (err) resolve(false);
+              else {
+                resolve(true);
+              }
+            }
+          );
+        }
+      });
+    });
+  }
+
+  public async Deletelocbyid(id: string): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      this.pool.getConnection((err, connection) => {
+        if (err) {
+          resolve(false);
+        } else {
+          this.pool.query(
+            `DELETE FROM store_location WHERE id = ?`,
+            [id],
+            (err, res) => {
+              connection.release();
+              if (err) resolve(false);
+              else {
+                resolve(true);
+              }
+            }
+          );
+        }
+      });
+    });
+  }
+
+  public async ListAbs(): Promise<absList[] | null> {
+    return new Promise<absList[] | null>((resolve) => {
+      this.pool.getConnection((err, connection) => {
+        if (err) resolve(null);
+        else {
+          this.pool.query(`SELECT * FROM abs`, (err: any, res: absList[]) => {
+            connection.release();
+            if (err) resolve(null);
+            else {
+              let Items: absList[] = [];
+              for (let i = 0; i < res.length; i++) {
+                let cur = res[i];
+
+                Items.push({
+                  id: cur.id,
+                  pictureUrl: `${config.url_config.absurl}/${cur.pictureUrl}`,
+                  title: cur.title,
+                  subtitle: cur.subtitle,
+                  Description: cur.Description,
+                });
+              }
+              resolve(Items);
+            }
+          });
+        }
+      });
+    });
+  }
+
+  public async UploadAbs(
+    pictureUrl: string,
+    title: string,
+    subtitle: string,
+    Description: string
+  ): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      this.pool.getConnection((err, connection) => {
+        if (err) {
+          resolve(false);
+        } else {
+          this.pool.query(
+            `INSERT INTO abs (id, pictureUrl, title, subtitle, Description)
+             VALUES (?,?,?,?,?)`,
+            [uuidv4(), pictureUrl, title, subtitle, Description],
+            (err, res) => {
+              connection.release();
+              if (err) resolve(false);
+              else {
+                resolve(true);
+              }
+            }
+          );
+        }
+      });
+    });
+  }
+
+  public async DeleteAbs(title: string): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      this.pool.getConnection((err, connection) => {
+        if (err) {
+          resolve(false);
+        } else {
+          this.pool.query(
+            `DELETE FROM abs WHERE title = ?`,
+            [title],
+            (err, res) => {
+              connection.release();
+              if (err) resolve(false);
+              else {
+                resolve(true);
+              }
+            }
+          );
+        }
+      });
+    });
+  }
+
+  public async UpdateAbs(
+    id: string,
+    title: string,
+    subtitle: string,
+    Description: string
+  ): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      this.pool.getConnection((err, connection) => {
+        if (err) {
+          resolve(false);
+        } else {
+          this.pool.query(
+            `Update abs 
+             SET title = ?, subtitle = ?, Description = ?
+             WHERE id = ?`,
+            [title, subtitle, Description, id],
             (err, res) => {
               connection.release();
               if (err) resolve(false);
