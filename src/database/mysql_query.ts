@@ -162,6 +162,7 @@ export class MysqlQuery {
              GROUP_CONCAT(store_location.id  SEPARATOR ', ') AS locid,
              GROUP_CONCAT(store_location.country  SEPARATOR ', ') AS city,
              GROUP_CONCAT(store_location.district  SEPARATOR ', ') AS district, 
+             GROUP_CONCAT(store_location.storeName  SEPARATOR ', ') AS storeName, 
              GROUP_CONCAT(store_location.address  SEPARATOR ', ') AS address FROM item 
              JOIN store_location 
              ON item.itemName = store_location.itemName
@@ -173,7 +174,6 @@ export class MysqlQuery {
                 let Items: ItemList[] = [];
                 for (let i = 0; i < res.length; i++) {
                   let cur = res[i];
-
                   Items.push({
                     id: cur.id,
                     locid: cur.locid.split(", "),
@@ -182,6 +182,7 @@ export class MysqlQuery {
                     title: cur.title,
                     subtitle: cur.subtitle,
                     itemDescription: cur.itemDescription,
+                    storeName: cur.storeName.split(", "),
                     city: cur.city.split(", "),
                     district: cur.district.split(", "),
                     address: cur.address.split(", "),
@@ -214,8 +215,6 @@ export class MysqlQuery {
             [uuidv4(), pictureUrl, itemName, title, subtitle, itemDescription],
             (err, res) => {
               connection.release();
-              console.log(err);
-              console.log(res);
               if (err) resolve(false);
               else {
                 resolve(true);
@@ -281,6 +280,7 @@ export class MysqlQuery {
 
   public async UploadLoc(
     itemName: string,
+    storeName: string,
     city: string,
     district: string,
     address: string
@@ -291,12 +291,11 @@ export class MysqlQuery {
           resolve(false);
         } else {
           this.pool.query(
-            `INSERT INTO store_location (id,itemName,country,district,address)
-             VALUES (?,?,?,?,?)`,
-            [uuidv4(), itemName, city, district, address],
+            `INSERT INTO store_location (id,itemName,storeName,country,district,address)
+             VALUES (?,?,?,?,?,?)`,
+            [uuidv4(), itemName, storeName, city, district, address],
             (err, res) => {
               connection.release();
-              console.log(err);
               if (err) resolve(false);
               else {
                 resolve(true);

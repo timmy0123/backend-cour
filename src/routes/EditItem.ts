@@ -17,6 +17,7 @@ router.post("/", upload.none(), (req, res) => {
   let city = req.query.city as string[];
   let district = req.query.district as string[];
   let address = req.query.address as string[];
+  let storeName = req.query.storeName as string[];
   if (typeof locid === "string") {
     locid = [locid];
   }
@@ -28,6 +29,9 @@ router.post("/", upload.none(), (req, res) => {
   }
   if (typeof address === "string") {
     address = [address];
+  }
+  if (typeof storeName === "string") {
+    storeName = [storeName];
   }
 
   (async () => {
@@ -50,6 +54,7 @@ router.post("/", upload.none(), (req, res) => {
     for (let i = 0; i < city.length; i++) {
       const locdata = await queryEvent.UploadLoc(
         itemName,
+        storeName[i],
         city[i],
         district[i],
         address[i]
