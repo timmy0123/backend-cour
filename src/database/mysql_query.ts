@@ -72,7 +72,6 @@ export class MysqlQuery {
              VALUES (?,?,?,?)`,
             ["1", name, "", Password],
             (err, res: any) => {
-              console.log(err);
               connection.release();
               if (err) resolve(false);
               else {

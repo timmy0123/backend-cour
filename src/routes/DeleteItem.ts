@@ -9,7 +9,6 @@ router.delete("/", (req, res) => {
   const queryEvent = new MysqlQuery();
   const fileName = req.query.fileName as string;
   const itemName = req.query.itemName as string;
-  console.log(fileName, itemName);
   const pth = path.resolve(__dirname, "../../public/images/items", fileName);
 
   if (fs.existsSync(pth)) {
