@@ -43,6 +43,48 @@ export class MysqlQuery {
     });
   }
 
+  public async DeleteAdmin(): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      this.pool.getConnection((err, connection) => {
+        if (err) {
+          resolve(false);
+        } else {
+          this.pool.query(`DELETE FROM admin`, (err, res: any) => {
+            connection.release();
+            if (err) resolve(false);
+            else {
+              resolve(true);
+            }
+          });
+        }
+      });
+    });
+  }
+
+  public async InsertAdmin(name: string, Password: string): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      this.pool.getConnection((err, connection) => {
+        if (err) {
+          resolve(false);
+        } else {
+          this.pool.query(
+            `INSERT INTO admin (id, name, email, password) 
+             VALUES (?,?,?,?)`,
+            ["1", name, "", Password],
+            (err, res: any) => {
+              console.log(err);
+              connection.release();
+              if (err) resolve(false);
+              else {
+                resolve(true);
+              }
+            }
+          );
+        }
+      });
+    });
+  }
+
   public async UploadImg(FileName: string): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
       this.pool.getConnection((err, connection) => {
@@ -152,6 +194,34 @@ export class MysqlQuery {
     });
   }
 
+  public async GetImg(): Promise<Imageurl[] | null> {
+    return new Promise<Imageurl[] | null>((resolve) => {
+      this.pool.getConnection((err, connection) => {
+        if (err) {
+          resolve(null);
+        } else {
+          this.pool.query(
+            `SELECT * FROM Image WHERE used = true`,
+            (err: any, res: ImageList[]) => {
+              if (err) resolve(null);
+              else {
+                let Imgs: Imageurl[] = [];
+                for (let i = 0; i < res.length; i++) {
+                  let cur = res[i];
+                  Imgs.push({
+                    url: `${config.url_config.url}/${cur.fileName}`,
+                    used: cur.used,
+                  });
+                }
+                resolve(Imgs);
+              }
+            }
+          );
+        }
+      });
+    });
+  }
+
   public async ListItem(): Promise<ItemList[] | null> {
     return new Promise<ItemList[] | null>((resolve) => {
       this.pool.getConnection((err, connection) => {
@@ -189,6 +259,58 @@ export class MysqlQuery {
                   });
                 }
                 resolve(Items);
+              }
+            }
+          );
+        }
+      });
+    });
+  }
+
+  public async GetItem(itemName: string): Promise<ItemList | null> {
+    return new Promise<ItemList | null>((resolve) => {
+      this.pool.getConnection((err, connection) => {
+        if (err) resolve(null);
+        else {
+          this.pool.query(
+            `SELECT 
+            item.id,
+            pictureUrl,
+            item.itemName,
+            title,
+            subtitle,
+            itemDescription, 
+            GROUP_CONCAT(store_location.id  SEPARATOR ', ') AS locid,
+            GROUP_CONCAT(store_location.country  SEPARATOR ', ') AS city,
+            GROUP_CONCAT(store_location.district  SEPARATOR ', ') AS district, 
+            GROUP_CONCAT(store_location.storeName  SEPARATOR ', ') AS storeName, 
+            GROUP_CONCAT(store_location.address  SEPARATOR ', ') AS address 
+        FROM 
+            item 
+        JOIN 
+            store_location ON item.itemName = store_location.itemName
+        WHERE 
+            item.itemName = ?
+        GROUP BY 
+            item.itemName`,
+            [itemName],
+            (error, res: any) => {
+              connection.release();
+              if (err) resolve(null);
+              else {
+                resolve({
+                  id: res.id,
+                  locid: res.locid.split(", "),
+                  pictureUrl: `${config.url_config.itemurl}/${res.pictureUrl}`,
+                  itemName: res.itemName,
+                  title: res.title,
+                  subtitle: res.subtitle,
+                  itemDescription: res.itemDescription,
+                  storeName: res.storeName.split(", "),
+                  city: res.city.split(", "),
+                  district: res.district.split(", "),
+                  address: res.address.split(", "),
+                });
               }
             }
           );

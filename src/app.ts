@@ -21,8 +21,12 @@ const ListAbs = require("./routes/ListAbs");
 const UploadAbs = require("./routes/UploadAbs");
 const DeleteAbs = require("./routes/DeleteAbs");
 const EditAbs = require("./routes/EditAbs");
+const GetItem = require("./routes/GetItem");
+const GetImg = require("./routes/GetImg");
+const EditUser = require("./routes/EditUser");
 
 app.use("/GetUser", GetUser);
+app.use("/EditUser", EditUser);
 app.use("/UploadImg", UploadImg);
 app.use("/ListImg", ListImg);
 app.use("/DeleteImg", DeleteImg);
@@ -35,6 +39,8 @@ app.use("/ListAbs", ListAbs);
 app.use("/UploadAbs", UploadAbs);
 app.use("/DeleteAbs", DeleteAbs);
 app.use("/EditAbs", EditAbs);
+app.use("/GetItem", GetItem);
+app.use("/GetImg", GetImg);
 app.use(
   "/image",
   express.static(path.join(__dirname, "../public/images/uploads"))
