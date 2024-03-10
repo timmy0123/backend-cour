@@ -40,3 +40,20 @@ export interface absList {
   subtitle: string;
   Description: string;
 }
+
+export type deleteResuld =
+  | "success delete"
+  | "error delete"
+  | "database broken";
+export type loginResult =
+  | "login success"
+  | "wrong user or password"
+  | "database broken";
+export type updateResult =
+  | "success update"
+  | "error update"
+  | "database broken";
+export type uploadResuld =
+  | "success upload"
+  | "error upload"
+  | "database broken";

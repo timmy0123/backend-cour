@@ -1,5 +1,5 @@
 import express from "express";
-import { MysqlQuery } from "../database/mysql_query";
+import { MysqlQuery } from "../model/mysql_query";
 
 const multer = require("multer");
 const fs = require("fs");
