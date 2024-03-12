@@ -13,18 +13,10 @@ const Image = require("./routes/image");
 const Abs = require("./routes/abs");
 const Item = require("./routes/item");
 
-const UploadItem = require("./routes/UploadItem");
-const DeleteItem = require("./routes/DeleteItem");
-const EditItem = require("./routes/EditItem");
-
 app.use("/User", User);
 app.use("/Image", Image);
 app.use("/Abs", Abs);
 app.use("/Item", Item);
-
-app.use("/UploadItem", UploadItem);
-app.use("/DeleteItem", DeleteItem);
-app.use("/EditItem", EditItem);
 
 app.use(
   "/image",
