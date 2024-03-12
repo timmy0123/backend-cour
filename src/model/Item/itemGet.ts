@@ -37,6 +37,7 @@ module.exports = function itemGet(itemName: string) {
             connection.release();
             if (err) reject(`err: ${err}`);
             else {
+              res = res[0];
               resolve({
                 id: res.id,
                 locid: res.locid.split(", "),
