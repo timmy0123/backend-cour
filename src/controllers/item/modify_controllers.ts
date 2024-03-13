@@ -71,7 +71,7 @@ module.exports = class modifyItem {
       }
     }
 
-    const newPath = `public/images/abs/${req!.file!.originalname.replace(
+    const newPath = `public/images/items/${req!.file!.originalname.replace(
       / /g,
       "_"
     )}`;
@@ -87,7 +87,12 @@ module.exports = class modifyItem {
   deleteItem(req: Request, res: Response, next: NextFunction) {
     const fileName = req.query.fileName as string;
     const itemName = req.query.itemName as string;
-    const pth = path.resolve(__dirname, "../../public/images/items", fileName);
+    const pth = path.resolve(
+      __dirname,
+      "../../../public/images/items",
+      fileName
+    );
+
     if (fs.existsSync(pth)) {
       itemDelete(itemName)
         .then((result: deleteResuld) => {
@@ -138,7 +143,7 @@ module.exports = class modifyItem {
     if (typeof storeName === "string") {
       storeName = [storeName];
     }
-
+    console.log(description);
     try {
       const metadata = await itemUpdate(
         id,
@@ -148,6 +153,7 @@ module.exports = class modifyItem {
         description
       );
     } catch (error) {
+      console.log(error);
       res.status(401).json({ message: error });
     }
 

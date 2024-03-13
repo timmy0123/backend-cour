@@ -21,8 +21,8 @@ const upload = multer({ storage: storage });
 
 router.get("/listitem", itemGet.listItem);
 router.get("/getItem", itemGet.getItem);
-router.post("/uploadItem", itemModify.uploadItem);
+router.post("/uploadItem", upload.single("image"), itemModify.uploadItem);
 router.delete("/deleteItem", itemModify.deleteItem);
-router.put("/updateItem", itemModify.updateitem);
+router.put("/updateItem", upload.none(), itemModify.updateitem);
 
 module.exports = router;
