@@ -7,9 +7,9 @@ import {
 } from "../../interface/interface";
 import { error } from "console";
 
-const itemUpload = require("../../model/item/itemUpload");
-const itemDelete = require("../../model/item/itemDelete");
-const itemUpdate = require("../../model/item/itemUpdate");
+const itemUpload = require("../../model/Item/itemUpload");
+const itemDelete = require("../../model/Item/itemDelete");
+const itemUpdate = require("../../model/Item/itemUpdate");
 const locationUpload = require("../../model/location/locationUpload");
 const locationDelete = require("../../model/location/locationDelete");
 const locationDeleteById = require("../../model/location/locationDeleteById");
