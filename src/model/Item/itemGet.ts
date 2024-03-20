@@ -37,20 +37,22 @@ module.exports = function itemGet(itemName: string) {
             connection.release();
             if (err) reject(`err: ${err}`);
             else {
-              res = res[0];
-              resolve({
-                id: res.id,
-                locid: res.locid.split(", "),
-                pictureUrl: `${config.url_config.itemurl}/${res.pictureUrl}`,
-                itemName: res.itemName,
-                title: res.title,
-                subtitle: res.subtitle,
-                itemDescription: res.itemDescription,
-                storeName: res.storeName.split(", "),
-                city: res.city.split(", "),
-                district: res.district.split(", "),
-                address: res.address.split(", "),
-              });
+              if (res.length > 0) {
+                res = res[0];
+                resolve({
+                  id: res.id,
+                  locid: res.locid.split(", "),
+                  pictureUrl: `${config.url_config.itemurl}/${res.pictureUrl}`,
+                  itemName: res.itemName,
+                  title: res.title,
+                  subtitle: res.subtitle,
+                  itemDescription: res.itemDescription,
+                  storeName: res.storeName.split(", "),
+                  city: res.city.split(", "),
+                  district: res.district.split(", "),
+                  address: res.address.split(", "),
+                });
+              } else reject("no data");
             }
           }
         );
