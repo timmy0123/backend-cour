@@ -20,7 +20,7 @@ module.exports = function itemList() {
              GROUP_CONCAT(store_location.address  SEPARATOR ', ') AS address FROM item 
              JOIN store_location 
              ON item.itemName = store_location.itemName
-             GROUP BY item.itemName`,
+             GROUP BY item.id`,
           (err: any, res: Itemdb[]) => {
             connection.release();
             if (err) reject(`err: ${err}`);

@@ -31,7 +31,7 @@ module.exports = function itemGet(itemName: string) {
         WHERE 
             item.itemName = ?
         GROUP BY 
-            item.itemName`,
+            item.id`,
           [itemName],
           (error, res: any) => {
             connection.release();
